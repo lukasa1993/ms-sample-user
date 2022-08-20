@@ -1,3 +1,4 @@
+import scopeCheck  from '@lukasa1993/scope-check';
 import healthcheck from 'maikai';
 import metalogger  from 'metalogger';
 import morgan      from 'morgan';
@@ -10,7 +11,7 @@ const log = metalogger();
 function serviceRoutes(app) {
   app.use(healthcheck().express());
   app.use('/internal', internal);
-  app.use('/external', external);
+  app.use('/external', scopeCheck({ scopes: ['admin', 'user'], debug: false }), external);
 }
 
 function setupErrorHandling(app) {
@@ -37,7 +38,7 @@ function setupErrorHandling(app) {
   });
 }
 
-export default async function (app, callback) {
+export default async function(app, callback) {
   morgan.token('clientaddr', req => req.headers['x-forwarded-for'] || req.connection.remoteAddress);
   app.use(morgan(':clientaddr :method :url :status :response-time ms - :res[content-length]', { skip: req => req.originalUrl === '/health' }));
   serviceRoutes(app);
