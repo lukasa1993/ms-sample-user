@@ -28,6 +28,11 @@ export async function up(client) {
       values (${company.uuid}, 'admin', 'admin@example.com', 'admin')
   `;
 
+  await client`
+      create unique index email_unique
+          on "Users"."Users" (email);
+  `;
+
 }
 
 export async function down(client) {
