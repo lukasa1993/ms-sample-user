@@ -45,7 +45,7 @@ export default async function(app, callback) {
   serviceRoutes(app);
   setupErrorHandling(app);
 
-  await migrate();
+  await migrate("Users");
 
   if (typeof callback === 'function') {
     callback(app);

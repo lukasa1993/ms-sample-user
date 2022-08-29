@@ -1,7 +1,11 @@
-exports.up = async client => {
-  await client`drop table IF EXISTS "Users"`;
+import { byEmail } from '../lib/modules/company/index.js';
+
+export async function up(client) {
+  const company = await byEmail({ email: 'support@example.com' });
+
+  await client`drop table IF EXISTS "Users"."Users"`;
   await client`
-      create table "Users"
+      create table "Users"."Users"
       (
           uuid         uuid                     default gen_random_uuid() not null,
           company_uuid uuid                                               not null,
@@ -15,19 +19,17 @@ exports.up = async client => {
       )`;
 
   await client`
-      insert into "Users"("company_uuid", "name", "email", "code")
-      select uuid as "company_uuid", 'demo' as "name", 'demo@example.com' as "email", '1234567890' as "code"
-      from "Company"
-      where email = 'support@example.com'`;
+      insert into "Users"."Users"("company_uuid", "name", "email", "code")
+      values (${company.uuid}, 'demo', 'demo@example.com', '1234567890')
+  `;
 
   await client`
-      insert into "Users"("company_uuid", "name", "email", "type")
-      select uuid as "company_uuid", 'admin' as "name", 'admin@example.com' as "email", 'admin' as "type"
-      from "Company"
-      where email = 'support@example.com'`;
+      insert into "Users"."Users"("company_uuid", "name", "email", "type")
+      values (${company.uuid}, 'admin', 'admin@example.com', 'admin')
+  `;
 
-};
+}
 
-exports.down = async client => {
+export async function down(client) {
   // just in case...
-};
+}
