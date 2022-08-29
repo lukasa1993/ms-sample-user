@@ -2,6 +2,7 @@ import scopeCheck  from '@lukasa1993/scope-check';
 import healthcheck from 'maikai';
 import metalogger  from 'metalogger';
 import morgan      from 'morgan';
+import { migrate } from 'ms-db';
 
 import external from './lib/routes/external/index.js';
 import internal from './lib/routes/internal/index.js';
@@ -43,6 +44,8 @@ export default async function(app, callback) {
   app.use(morgan(':clientaddr :method :url :status :response-time ms - :res[content-length]', { skip: req => req.originalUrl === '/health' }));
   serviceRoutes(app);
   setupErrorHandling(app);
+
+  await migrate();
 
   if (typeof callback === 'function') {
     callback(app);
